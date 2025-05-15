@@ -1,9 +1,9 @@
 # ChatBox-Industria4.0
 
-Projeto desenvolvido por
-Arthur Vital Fontana
-Fernando Biadelli
-João Henrique Nazar Tavares
-Maria Julia Gomes
-Rafael Mele Porto
+Projeto desenvolvido por <br>
+Arthur Vital Fontana <br>
+Fernando Biadelli <br>
+João Henrique Nazar Tavares <br>
+Maria Julia Gomes <br>
+Rafael Mele Porto <br>
 Sophia Vasco Pires
