@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Chatbot Odontológico</title>
+<link rel="stylesheet" href="bot.css" />
+</head>
+<body>
+
+<div id="chat-container">
+  <div id="chat-log"></div>
+  <input id="chat-input" type="text" placeholder="Digite sua mensagem..." />
+  <button id="send-btn">Enviar</button>
+</div>
+
+<script>
+  const chatLog = document.getElementById('chat-log');
+  const chatInput = document.getElementById('chat-input');
+  const sendBtn = document.getElementById('send-btn');
+
+  let estado = 'inicio'; // 'inicio', 'esperandoNome', 'esperandoData', 'esperandoHorario'
+
+  // Variáveis para guardar os dados do agendamento
+  let nomeUsuario = '';
+  let dataConsulta = '';
+  let horarioConsulta = '';
+
+  function addMessage(text, sender) {
+    const msgDiv = document.createElement('div');
+    msgDiv.textContent = text;
+    msgDiv.className = 'message ' + sender;
+    chatLog.appendChild(msgDiv);
+    chatLog.scrollTop = chatLog.scrollHeight;
+  }
+
+  function getBotResponse(input) {
+    input = input.toLowerCase().trim();
+
+    if (estado === 'inicio') {
+      if (input.includes('marcar')) {
+        estado = 'esperandoNome';
+        return 'Claro! Por favor, informe seu nome completo.';
+      } else if (input.includes('oi') || input.includes('olá')) {
+        return 'Olá! Como posso ajudar você hoje? Você pode me dizer que deseja marcar um agendamento.';
+      } else {
+        return 'Desculpe, não entendi. Pode repetir?';
+      }
+    } else if (estado === 'esperandoNome') {
+      nomeUsuario = input;
+      estado = 'esperandoData';
+      return 'Obrigado, ' + nomeUsuario + '. Agora informe a data desejada (ex: 25/05).';
+    } else if (estado === 'esperandoData') {
+      if (input.match(/^\d{2}\/\d{2}$/)) {
+        dataConsulta = input;
+        estado = 'esperandoHorario';
+        return 'Data recebida. Agora informe o horário desejado (ex: 14:00).';
+      } else {
+        return 'Formato de data inválido. Por favor, informe no formato DD/MM.';
+      }
+    } else if (estado === 'esperandoHorario') {
+      if (input.match(/^\d{2}:\d{2}$/)) {
+        horarioConsulta = input;
+        estado = 'inicio';
+
+        // Enviar dados para backend Flask
+        fetch('http://localhost:5000/salvar-agendamento', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            nome: nomeUsuario,
+            data_consulta: dataConsulta,
+            horario: horarioConsulta
+          })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if(data.status === "sucesso") {
+            addMessage("Seu agendamento foi salvo com sucesso!", 'bot');
+          } else {
+            addMessage("Erro ao salvar o agendamento: " + data.mensagem, 'bot');
+          }
+        })
+        .catch(() => {
+          addMessage("Erro na comunicação com o servidor.", 'bot');
+        });
+
+        return 'Ótimo! Seu agendamento foi registrado. Obrigado!';
+      } else {
+        return 'Formato de horário inválido. Por favor, informe no formato HH:MM.';
+      }
+    }
+  }
+
+  sendBtn.addEventListener('click', () => {
+    const userText = chatInput.value.trim();
+    if (!userText) return;
+    addMessage(userText, 'user');
+    chatInput.value = '';
+    setTimeout(() => {
+      const botReply = getBotResponse(userText);
+      addMessage(botReply, 'bot');
+    }, 500);
+  });
+
+  chatInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      sendBtn.click();
+    }
+  });
+
+  addMessage('Olá! Eu sou o chatbot da clínica odontológica. Como posso ajudar?', 'bot');
+</script>
+
+</body>
+</html>

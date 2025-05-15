@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Agendamentos Clínica Odontológica</title>
+  <link rel="stylesheet" href="agendamentostela.css" />
+</head>
+<body>
+
+  <h1>Agenda Odontológica</h1>
+  <table id="tabela-agendamentos">
+      <thead>
+          <tr>
+              <th>Data Registro</th>
+              <th>Nome Cliente</th>
+              <th>Data Consulta</th>
+              <th>Horário</th>
+              <th>Tipo</th>
+          </tr>
+      </thead>
+      <tbody></tbody>
+  </table>
+
+  <script>
+      const sheetID = '14WYl5v0OMsfUYuW8gvs1iohyi5mcCPjQi0q8tZC6_c8';
+      const apiKey = 'AIzaSyDRifFSm38r5nByj8fg0yA0bOZWaOvX3RE';
+      const range = 'Página1!A:E';
+
+      fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${range}?key=${apiKey}`)
+      .then(response => response.json())
+      .then(data => {
+          const table = document.getElementById('tabela-agendamentos').getElementsByTagName('tbody')[0];
+
+          // Pega todas as linhas de dados (exceto cabeçalho)
+          let rows = data.values.slice(1);
+
+          // Filtra para mostrar somente agendamentos com status "Agendamento"
+          rows = rows.filter(row => row[4] === "Agendamento");
+
+          // Ordena as linhas pela coluna 2 (Data Consulta) - crescente
+          rows.sort((a, b) => {
+              const [diaA, mesA] = a[2].split('/').map(Number);
+              const [diaB, mesB] = b[2].split('/').map(Number);
+              const dateA = new Date(2025, mesA - 1, diaA);
+              const dateB = new Date(2025, mesB - 1, diaB);
+              return dateA - dateB;
+          });
+
+          // Limpa conteúdo da tabela
+          table.innerHTML = '';
+
+          // Insere as linhas ordenadas
+          rows.forEach(row => {
+              let newRow = table.insertRow();
+              row.forEach(cell => {
+                  let newCell = newRow.insertCell();
+                  newCell.textContent = cell;
+              });
+          });
+      })
+      .catch(error => console.error("Erro ao carregar agendamentos:", error));
+  </script>
+
+</body>
+</html>

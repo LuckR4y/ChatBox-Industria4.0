@@ -1,0 +1,87 @@
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  margin: 0;
+  padding: 30px;
+  display: flex;
+  flex-direction: column; /* organiza conteúdo em coluna */
+  align-items: center; /* centraliza horizontalmente */
+  min-height: 100vh;
+  color: #333;
+}
+
+h1 {
+  color: #fff;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  margin: 0 0 20px 0; /* margem só embaixo, separando da tabela */
+  font-size: 2rem;
+  text-align: center;
+  width: 600px; /* mesmo tamanho da tabela para alinhar */
+  max-width: 90vw;
+}
+
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 800px;     /* fixa largura da tabela */
+  max-width: 90vw; /* responsivo no mobile */
+  background-color: #fff;
+  border-radius: 15px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  table-layout: fixed;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+thead tr {
+  background: #2575fc;
+  color: white;
+  font-weight: 600;
+  text-align: center;
+  font-size: 1rem;
+}
+
+thead th:nth-child(1),
+tbody td:nth-child(1) {
+  width: 15%;
+}
+
+thead th:nth-child(2),
+tbody td:nth-child(2) {
+  width: 30%;
+  word-break: break-word;
+}
+
+thead th:nth-child(3),
+tbody td:nth-child(3) {
+  width: 15%;
+}
+
+thead th:nth-child(4),
+tbody td:nth-child(4) {
+  width: 15%;
+}
+
+thead th:nth-child(5),
+tbody td:nth-child(5) {
+  width: 25%;
+  word-break: break-word;
+}
+
+th, td {
+  padding: 8px 6px;
+  border-bottom: 1px solid #eee;
+  text-align: center;
+  font-size: 0.85rem;
+  overflow-wrap: break-word;
+}
+
+tbody tr:hover {
+  background-color: #f0f5ff;
+  cursor: default;
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}

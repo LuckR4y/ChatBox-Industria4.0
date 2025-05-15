@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "oceanic-hash-459911-h2",
+  "private_key_id": "cc9aaece4462dc764bbaccf00338bfc6483b561f",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDAywR7Sr9B35IP\n5FwPqIDuyhPiuZ+jh/jfe7mKD9o329kYgdJq8onO5Jb8zzzSDAv/HYmDga2Ckdu5\n+IYDWsu7t5iJotxyfTMR+n61VcBIRLnDukL0pG2o7hQTsdd+dEgRk/WuSlPnMqzX\nJFtO78nE4d4sBsRo+ZUgzRkMhe1S5vCmkX+Nmee7TZsKF6gGfXAMRO/nNBfhW1vD\nzbB75c2q5t8WM0Ae60Et3hpTfERZ1q4OvVs/2zxg8ksiBGDGvrVxqb9JlSXXYfgF\nIDhPvhshV2rFBtzyow2ACa0NY71c/j48tsc5PS3gofLXMcXDlIvtB71w4b1zYTnR\nQnU3VROBAgMBAAECggEAE7+4LHkHsSkZvo8B7zNaTHEJgHF2AjvCKVfJ4HP8l+Q+\nujKc6gpWRjScUuFXtZyOTgp/NP1qV18MRwyc4xMV85tnAL0HdU2Qlwg17+q3e6+u\nkneDYalw95u2asi47mHdpWSmshKNww0p2hAGBRwDFdadT508hBRXoQ3hbFWmbetp\n4XA5F/FIy8B70OsIyqXKhRoG+NHwZxwtgGSvr7CXG3qKsNQaVXpZvd9IVKmzkAD8\nBrPdnuKnVSFDwZiukg+2cedjw7oHLnvD+HTN3cwTYDcmaVUo/NYPtaWHZS5cnUL6\nwDLlI+XGrByZYlNvarSriJ/fEvRC5zgzwuOgT1b40QKBgQDy1Ew0//Sw0qqTfTrN\nTS8rXTEQChkBXtdxq5kz514BJGuynTHJ8RIfIBhpp1Gk5RlH7nntJWokuhUOTOBS\nWYKJQ9Auva6divRakCMfEZFb5nXLNuOkFneQlpcsJlDIy5rQWa9KEs3FGjN2PA0Q\nzBWWCM8Izm47R0RQyjPQ4C7R8wKBgQDLP/Z87vjTKfk6CStk56C+ZWI474cIve4N\ntuheuGp0+BsL59dLAMYyq9u5KmK/BBls83lQABgU3ReSpmX+qX/6sm6gcYu3NUiO\nzjDE8iPA8pYfDcXIrDWVySo23zpXhl7nVXemlVEPHagwR3k+uTVnyKLHIsGVxF/P\nIbkNEV4tuwKBgQDjeJwqydqeCbpgj18WEsetB49+RvdFoWKQyP6q8IHO8B8zIq4R\nThJ7tcUos+R3Y2VbTLpKvFHCNc6jpsA8ZD0z+KJ8JpP8YL6mV3+PCxXv0ONnifOV\nMraua2MRqJLkhlZv9pOOAC9iBDlQ+NAEfCl8cqP+y+HXBdupEsGXWWqCoQKBgQCm\npGHPGwvN7lsV91Cp4bOMh4lZzyGyzC5y9iVdC+zUzFs4jrSZHSBjiT6UeakOnijO\niG1NZ1ZXPNLH/UAg5Q42GLfVOmNoKfq8g1e/Ehy4ZO0qttsT5gXlMlM3PB0Uh+ol\n15BLd59HOnScaO2CvM2JsxmrFdcMmT5IkIitqzDBYwKBgQDCbtJlIGDG/mV4fsI5\nrZPq7yErExaJOAXfe07VpE9P+2Cg4/zPj8Gr6OiNjb4IdYIKRlYzE6TMAmUaZWbR\ndK0xs9RNMd8rA6H8gSTIx5OrestNd9EOFYc/nFp+Q20kwtOqhNXcM5/CPvQI3QRQ\nKPhEymZrg8rILSn9U4TnvRcu9A==\n-----END PRIVATE KEY-----\n",
+  "client_email": "chatbot-clinica@oceanic-hash-459911-h2.iam.gserviceaccount.com",
+  "client_id": "102072727969766569853",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/chatbot-clinica%40oceanic-hash-459911-h2.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
