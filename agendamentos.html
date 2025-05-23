@@ -9,57 +9,64 @@
 <body>
 
   <h1>Agenda Odontológica</h1>
-  <table id="tabela-agendamentos">
+
+  <table id="tabela-agendamentos" border="1" cellpadding="10" cellspacing="0">
       <thead>
           <tr>
               <th>Data Registro</th>
               <th>Nome Cliente</th>
               <th>Data Consulta</th>
               <th>Horário</th>
-              <th>Tipo</th>
+              <th>Status</th>
           </tr>
       </thead>
       <tbody></tbody>
   </table>
 
   <script>
-      const sheetID = '14WYl5v0OMsfUYuW8gvs1iohyi5mcCPjQi0q8tZC6_c8';
-      const apiKey = 'AIzaSyDRifFSm38r5nByj8fg0yA0bOZWaOvX3RE';
-      const range = 'Página1!A:E';
+    async function carregarAgendamentos() {
+      try {
+        const response = await fetch('http://localhost:5000/listar-agendamentos');
+        if (!response.ok) throw new Error('Erro HTTP ' + response.status);
+        const data = await response.json();
 
-      fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${range}?key=${apiKey}`)
-      .then(response => response.json())
-      .then(data => {
-          const table = document.getElementById('tabela-agendamentos').getElementsByTagName('tbody')[0];
+        const tbody = document.querySelector('#tabela-agendamentos tbody');
+        const statusValidos = ["Agendamento", "Cancelado", "Remarcado"];
 
-          // Pega todas as linhas de dados (exceto cabeçalho)
-          let rows = data.values.slice(1);
+        // filtra por status válido
+        let rows = data.filter(row => statusValidos.includes(row.status));
 
-          // Filtra para mostrar somente agendamentos com status "Agendamento"
-          rows = rows.filter(row => row[4] === "Agendamento");
+        // ordena por data_consulta (formato dd/mm)
+        rows.sort((a, b) => {
+          const [dA, mA] = a.data_consulta.split('/').map(Number);
+          const [dB, mB] = b.data_consulta.split('/').map(Number);
+          return new Date(2025, mA - 1, dA) - new Date(2025, mB - 1, dB);
+        });
 
-          // Ordena as linhas pela coluna 2 (Data Consulta) - crescente
-          rows.sort((a, b) => {
-              const [diaA, mesA] = a[2].split('/').map(Number);
-              const [diaB, mesB] = b[2].split('/').map(Number);
-              const dateA = new Date(2025, mesA - 1, diaA);
-              const dateB = new Date(2025, mesB - 1, diaB);
-              return dateA - dateB;
+        tbody.innerHTML = '';
+
+        rows.forEach(row => {
+          const tr = document.createElement('tr');
+          [row.data_interacao, row.nome_cliente, row.data_consulta, row.horario, row.status].forEach(text => {
+            const td = document.createElement('td');
+            td.textContent = text || '';
+            tr.appendChild(td);
           });
+          tbody.appendChild(tr);
+        });
+      } catch (error) {
+        console.error('Erro ao carregar agendamentos:', error);
+      }
+    }
 
-          // Limpa conteúdo da tabela
-          table.innerHTML = '';
+    carregarAgendamentos();
+    setInterval(carregarAgendamentos, 30000);
 
-          // Insere as linhas ordenadas
-          rows.forEach(row => {
-              let newRow = table.insertRow();
-              row.forEach(cell => {
-                  let newCell = newRow.insertCell();
-                  newCell.textContent = cell;
-              });
-          });
-      })
-      .catch(error => console.error("Erro ao carregar agendamentos:", error));
+    window.addEventListener('storage', function(event) {
+      if(event.key === 'agendamentoAtualizado') {
+        carregarAgendamentos();
+      }
+    });
   </script>
 
 </body>
