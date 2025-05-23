@@ -5,7 +5,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 from datetime import datetime
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
 creds = ServiceAccountCredentials.from_json_keyfile_name("credenciais.json", scope)
@@ -107,6 +107,26 @@ def remarcar_agendamento():
             return jsonify({"status": "sucesso", "mensagem": f"Agendamento de {nome} remarcado para {nova_data} às {novo_horario}."})
         except Exception as e:
             print("[ERROR remarcar_agendamento] Erro ao remarcar:", e)
+            return jsonify({"status": "erro", "mensagem": str(e)}), 500
+    else:
+        return jsonify({"status": "erro", "mensagem": "Nenhum agendamento ativo encontrado para esse nome."}), 404
+    
+@app.route('/avisar-atraso', methods=['POST'])
+def avisar_atraso():
+    data = request.json
+    print("[DEBUG avisar_atraso] dados recebidos:", data)
+    nome = data.get('nome')
+
+    if not nome:
+        return jsonify({"status": "erro", "mensagem": "Nome é obrigatório"}), 400
+
+    linha = encontrar_linha_ativa(nome)
+    if linha:
+        try:
+            sheet.update_cell(linha, 5, "Aviso de atraso")
+            return jsonify({"status": "sucesso", "mensagem": f"Aviso de atraso registrado para {nome}."})
+        except Exception as e:
+            print("[ERROR avisar_atraso] Erro ao registrar aviso de atraso:", e)
             return jsonify({"status": "erro", "mensagem": str(e)}), 500
     else:
         return jsonify({"status": "erro", "mensagem": "Nenhum agendamento ativo encontrado para esse nome."}), 404
