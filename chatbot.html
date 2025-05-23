@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Chatbot Odontológico</title>
-<link rel="stylesheet" href="bot.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Chatbot Odontológico</title>
+  <link rel="stylesheet" href="bot.css" />
 </head>
 <body>
 
@@ -19,12 +19,16 @@
   const chatInput = document.getElementById('chat-input');
   const sendBtn = document.getElementById('send-btn');
 
-  let estado = 'inicio'; // 'inicio', 'esperandoNome', 'esperandoData', 'esperandoHorario'
+  // Estado geral do chatbot para controlar o fluxo
+  let estado = 'inicio';
 
-  // Variáveis para guardar os dados do agendamento
+  // Variáveis para guardar dados durante o diálogo
   let nomeUsuario = '';
   let dataConsulta = '';
   let horarioConsulta = '';
+
+  // Para remarcar/cancelar/avisar atraso
+  let acaoAtual = ''; // 'marcar', 'remarcar', 'cancelar', 'atrasar'
 
   function addMessage(text, sender) {
     const msgDiv = document.createElement('div');
@@ -34,62 +38,144 @@
     chatLog.scrollTop = chatLog.scrollHeight;
   }
 
+  function resetEstados() {
+    estado = 'inicio';
+    nomeUsuario = '';
+    dataConsulta = '';
+    horarioConsulta = '';
+    acaoAtual = '';
+  }
+
+  function enviarParaBackend(endpoint, dados, sucessoMsg, erroMsg) {
+    console.log("[DEBUG enviarParaBackend] Enviando para endpoint:", endpoint, "Dados:", dados);
+    fetch(`http://localhost:5000/${endpoint}`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(dados)
+    })
+    .then(resp => resp.json())
+    .then(data => {
+      console.log("[DEBUG enviarParaBackend] Resposta recebida:", data);
+      if(data.status === "sucesso") {
+        addMessage(sucessoMsg || data.mensagem, 'bot');
+        localStorage.setItem('agendamentoAtualizado', Date.now());
+      } else {
+        addMessage(erroMsg + ": " + data.mensagem, 'bot');
+      }
+      resetEstados();
+    })
+    .catch(() => {
+      addMessage("Erro na comunicação com o servidor.", 'bot');
+      resetEstados();
+    });
+  }
+
   function getBotResponse(input) {
+    console.log("[DEBUG getBotResponse] Input recebido:", input);
     input = input.toLowerCase().trim();
 
-    if (estado === 'inicio') {
-      if (input.includes('marcar')) {
+    if(estado === 'inicio') {
+
+      if(input.includes('remarcar')) {
+        acaoAtual = 'remarcar'; 
         estado = 'esperandoNome';
-        return 'Claro! Por favor, informe seu nome completo.';
-      } else if (input.includes('oi') || input.includes('olá')) {
-        return 'Olá! Como posso ajudar você hoje? Você pode me dizer que deseja marcar um agendamento.';
-      } else {
-        return 'Desculpe, não entendi. Pode repetir?';
+        console.log("[DEBUG] Ação atual setada para REMARCAR");
+        return 'Ok, para remarcar, por favor, informe seu nome completo.';
       }
-    } else if (estado === 'esperandoNome') {
+      
+      if(input.includes('marcar')) {
+        acaoAtual = 'marcar';
+        estado = 'esperandoNome';
+        console.log("[DEBUG] Ação atual setada para MARCAR");
+        return 'Ótimo! Por favor, informe seu nome completo.';
+      }
+      
+      if(input.includes('cancelar')) {
+        acaoAtual = 'cancelar';
+        estado = 'esperandoNome';
+        console.log("[DEBUG] Ação atual setada para CANCELAR");
+        return 'Certo, para cancelar, por favor, informe seu nome completo.';
+      }
+      if(input.includes('atrasar') || input.includes('atraso')) {
+        acaoAtual = 'atrasar';
+        estado = 'esperandoNome';
+        console.log("[DEBUG] Ação atual setada para ATRASAR");
+        return 'Tranquilo, precisamos apenas do seu nome completo para avisar o profissional.';
+      }
+      if(input.includes('oi') || input.includes('olá')) {
+        return 'Olá! Posso ajudar você a marcar, remarcar ou cancelar consultas, ou receber aviso de atraso. O que deseja?';
+      }
+      return 'Desculpe, não entendi. Você pode me dizer se quer marcar, remarcar, cancelar ou avisar atraso?';
+    }
+
+    if(estado === 'esperandoNome') {
+      if(input.length < 3) return 'Por favor, informe seu nome completo.';
       nomeUsuario = input;
-      estado = 'esperandoData';
-      return 'Obrigado, ' + nomeUsuario + '. Agora informe a data desejada (ex: 25/05).';
-    } else if (estado === 'esperandoData') {
-      if (input.match(/^\d{2}\/\d{2}$/)) {
-        dataConsulta = input;
-        estado = 'esperandoHorario';
-        return 'Data recebida. Agora informe o horário desejado (ex: 14:00).';
-      } else {
-        return 'Formato de data inválido. Por favor, informe no formato DD/MM.';
+      console.log("[DEBUG] Nome do usuário informado:", nomeUsuario);
+
+      if(acaoAtual === 'remarcar') {
+        estado = 'esperandoData';
+        return `Obrigado, ${nomeUsuario}. Informe a data desejada no formato DD/MM.`;
       }
-    } else if (estado === 'esperandoHorario') {
-      if (input.match(/^\d{2}:\d{2}$/)) {
-        horarioConsulta = input;
-        estado = 'inicio';
 
-        // Enviar dados para backend Flask
-        fetch('http://localhost:5000/salvar-agendamento', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({
-            nome: nomeUsuario,
-            data_consulta: dataConsulta,
-            horario: horarioConsulta
-          })
-        })
-        .then(response => response.json())
-        .then(data => {
-          if(data.status === "sucesso") {
-            addMessage("Seu agendamento foi salvo com sucesso!", 'bot');
-          } else {
-            addMessage("Erro ao salvar o agendamento: " + data.mensagem, 'bot');
-          }
-        })
-        .catch(() => {
-          addMessage("Erro na comunicação com o servidor.", 'bot');
-        });
+      if(acaoAtual === 'marcar') {
+        estado = 'esperandoData';
+        return `Obrigado, ${nomeUsuario}. Informe a data desejada no formato DD/MM.`;
+      }
 
-        return 'Ótimo! Seu agendamento foi registrado. Obrigado!';
-      } else {
-        return 'Formato de horário inválido. Por favor, informe no formato HH:MM.';
+      if(acaoAtual === 'cancelar') {
+        enviarParaBackend('cancelar-agendamento', {nome: nomeUsuario}, `Agendamento de ${nomeUsuario} cancelado com sucesso.`, 'Erro ao cancelar');
+        estado = 'esperandoConfirmacao';
+        return 'Processando seu cancelamento...';
+      }
+      if(acaoAtual === 'atrasar') {
+        enviarParaBackend('avisar-atraso', {nome: nomeUsuario}, 'Obrigado por avisar com antecedência, avisaremos o profissional sobre seu atraso.', 'Erro ao enviar aviso de atraso');
+        estado = 'esperandoConfirmacao';
+        return 'Registrando aviso de atraso...';
       }
     }
+
+    if(estado === 'esperandoData') {
+      if(!input.match(/^\d{2}\/\d{2}$/)) return 'Formato de data inválido. Informe no formato DD/MM.';
+      dataConsulta = input;
+      console.log("[DEBUG] Data da consulta informada:", dataConsulta);
+      estado = 'esperandoHorario';
+      return 'Data recebida. Agora informe o horário desejado no formato HH:MM.';
+    }
+
+    if(estado === 'esperandoHorario') {
+      if(!input.match(/^\d{2}:\d{2}$/)) return 'Formato de horário inválido. Informe no formato HH:MM.';
+      horarioConsulta = input;
+      console.log("[DEBUG] Horário da consulta informado:", horarioConsulta);
+
+      if(acaoAtual === 'remarcar') {
+        enviarParaBackend('remarcar-agendamento', {
+          nome: nomeUsuario,
+          nova_data: dataConsulta,
+          novo_horario: horarioConsulta
+        }, 'Agendamento remarcado com sucesso!', 'Erro ao remarcar agendamento');
+        estado = 'esperandoConfirmacao';
+        return 'Processando remarcação...';
+      }
+
+      if(acaoAtual === 'marcar') {
+        enviarParaBackend('salvar-agendamento', {
+          nome: nomeUsuario,
+          data_consulta: dataConsulta,
+          horario: horarioConsulta
+        }, 'Seu agendamento foi salvo com sucesso!', 'Erro ao salvar o agendamento');
+        estado = 'esperandoConfirmacao';
+        return 'Registrando seu agendamento...';
+      }
+    
+    }
+
+    if(estado === 'esperandoConfirmacao') {
+      return 'Aguarde um instante, processando...';
+    }
+
+    resetEstados();
+    return 'Vamos começar de novo. Como posso ajudar você? Quer marcar, remarcar, cancelar ou avisar atraso?';
   }
 
   sendBtn.addEventListener('click', () => {
